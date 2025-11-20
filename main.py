@@ -159,7 +159,7 @@ async def autenticar_usuario(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": token, "token_type": "bearer"}
 
 @app.get("/usuarios")
-async def obtener_usuarios(usuario: Usuario = Depends(obtener_usuario_actual)):
+async def obtener_usuarios():
     try:
         usuarios = supabase.table("usuarios").select("*").execute()
         return usuarios.data
@@ -167,7 +167,7 @@ async def obtener_usuarios(usuario: Usuario = Depends(obtener_usuario_actual)):
         return { "error": str(e) }
 
 @app.get("/usuarios/{usuario_id}")
-async def obtener_usuario_por_id(usuario_id: int, usuario: Usuario = Depends(obtener_usuario_actual)):
+async def obtener_usuario_por_id(usuario_id: int):
     try:
         usuario = supabase.table("usuarios").select("*").eq("id", usuario_id).execute()
         return usuario.data
@@ -175,7 +175,7 @@ async def obtener_usuario_por_id(usuario_id: int, usuario: Usuario = Depends(obt
         return { "error": str(e) }
 
 @app.post("/usuarios")
-async def crear_usuarios(usuario_data: UsuarioCreate, usuario: Usuario = Depends(obtener_usuario_actual)):
+async def crear_usuarios(usuario_data: UsuarioCreate):
     try:
         hashed_password = hash_password(usuario_data.contraseña)
         usuario_dict = usuario_data.model_dump()
