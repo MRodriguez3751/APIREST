@@ -265,10 +265,14 @@ async def actualizar_tareas(tarea_id: int, tarea_data: TareaUpdate, usuario: Usu
             raise HTTPException(status_code=404, detail="Tarea no encontrada.")
         
         update_data = tarea_data.model_dump(exclude_unset=True)
+        
+        if "fecha_limite" in update_data and isinstance(update_data["fecha_limite"], date):
+            update_data["fecha_limite"] = update_data["fecha_limite"].isoformat()
+
         response = supabase.table("tareas").update(update_data).eq("id", tarea_id).execute()
         return response.data
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/tareas/{tarea_id}")
 async def eliminar_tareas(tarea_id: int, usuario: Usuario = Depends(obtener_usuario_actual)):
